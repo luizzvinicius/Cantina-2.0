@@ -32,6 +32,7 @@ public class ConnectionFactory implements AutoCloseable {
             stmt.executeBatch();
         } catch (SQLException e) {
             System.out.println("Erro ao criar preparedStatement: " + e.getMessage());
+            System.exit(1);
         } catch (IOException e) {
             System.out.println("Erro ao ler arquivo: " + e.getMessage());
         }
