@@ -1,5 +1,6 @@
 package cantina.validacao;
 
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -38,11 +39,11 @@ public class Entrada implements AutoCloseable {
         }
     }
 
-    public char[] lerSenha(String msg) {
+    public String lerSenha(String msg) {
         var scan = System.console();
         while (true) {
             System.out.print(msg);
-            var senha = scan.readPassword();
+            var senha = scan.readLine().strip();
             return senha;
         }
     }
