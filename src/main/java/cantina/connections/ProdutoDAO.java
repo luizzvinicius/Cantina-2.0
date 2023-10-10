@@ -1,7 +1,10 @@
 package cantina.connections;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import cantina.Produto;
 
@@ -21,14 +24,37 @@ public class ProdutoDAO {
             stmt.setString(3, p.getNome());
             stmt.setDouble(4, p.getPrecoCompra());
             stmt.setDouble(5, p.getPrecoVenda());
-            stmt.setInt(6, p.getQtdComprada());
-            stmt.setInt(7, p.getQtdVendida());
-            stmt.setInt(8, p.getQtdComprada());
+            stmt.setDouble(6, p.getQtdComprada());
+            stmt.setDouble(7, p.getQtdVendida());
+            stmt.setDouble(8, p.getQtdComprada());
             rowsAffect = stmt.executeUpdate();
             System.out.println("Produto inserido.");
         } catch (SQLException e) {
             System.out.println("Não foi possível inserir o produto: " + e.getMessage() + "\n");
         }
         return rowsAffect;
+    }
+
+    public List<Produto> select() {
+        final String sql = "select * from produto";
+        List<Produto> produtos = new ArrayList<>();
+        try (var stmt = this.conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                produtos.add(new Produto(
+                    rs.getInt("codigo"),
+                    rs.getInt("id_funcionario"),
+                    rs.getString("nome"), 
+                    rs.getDouble("preco_compra"),
+                    rs.getDouble("preco_venda"),
+                    rs.getInt("quantidade_comprada"),
+                    rs.getInt("quantidade_vendida"),
+                    rs.getInt("quantidade_atual")
+                    ));
+            }
+        } catch (SQLException e) {
+            System.out.println("Não foi possível selecionar produto(s): " + e.getMessage() + "\n");
+        }
+        return produtos;
     }
 }
