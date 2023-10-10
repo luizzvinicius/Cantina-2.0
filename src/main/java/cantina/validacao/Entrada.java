@@ -1,6 +1,5 @@
 package cantina.validacao;
 
-import java.util.Objects;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
