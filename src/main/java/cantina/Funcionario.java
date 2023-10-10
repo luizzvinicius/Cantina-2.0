@@ -1,20 +1,14 @@
 package cantina;
 
 public class Funcionario {
-    private String nome, email;
-    private int id, senha;
+    private String nome, email, senha;
+    private int id;
 
-    public Funcionario(int id, String nome, String email, int senha) {
+    public Funcionario(int id, String nome, String email, String senha) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder(nome);
-        return builder.toString();
     }
 
     public int getId() {
@@ -29,7 +23,7 @@ public class Funcionario {
         return email;
     }
 
-    public int getSenha() {
+    public String getSenha() {
         return senha;
     }
 }
