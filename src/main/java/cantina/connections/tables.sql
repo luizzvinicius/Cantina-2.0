@@ -13,9 +13,9 @@ CREATE TABLE IF NOT EXISTS produto (
     nome VARCHAR(100) NOT NULL UNIQUE,
     preco_compra Decimal(14,2) NOT NULL,
     preco_venda Decimal(14,2) NOT NULL,
-    quantidade_comprada INT(7) NOT NULL,
-    quantidade_vendida INT(7) NOT NULL,
-    quantidade_atual INT(7) NOT NULL,
+    quantidade_comprada Decimal(14,2) NOT NULL,
+    quantidade_vendida Decimal(14,2) NOT NULL,
+    quantidade_atual Decimal(14,2) NOT NULL,
     PRIMARY KEY (codigo),
     FOREIGN KEY (id_funcionario) REFERENCES funcionario(id)
 );
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS item_venda (
     codigo_produto INT(8),
     codigo_venda INT(8),
     preco_venda Decimal(14,2),
-    quantidade INT(8) NOT NULL,
+    quantidade Decimal(14,2) NOT NULL,
     PRIMARY KEY (codigo_item),
     FOREIGN KEY (codigo_produto) REFERENCES produto(codigo),
     FOREIGN KEY (codigo_venda) REFERENCES venda(codigo)
