@@ -2,6 +2,8 @@ package cantina;
 
 import cantina.connections.*;
 import cantina.validacao.Entrada;
+
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,22 +25,16 @@ public class Main {
 
             int opt = scan.lerOption("Opção: ", 1, opcoes.size(), "Opção inválida") - 1;
             if (opt == 0) {
+                List<Produto> produtos = new ProdutoDAO(conn).select();
+                System.out.printf("%-10s %-5s %-5s%n", "Nome", "Preço", "Quantidade disponível");
+                produtos.forEach(p -> System.out.printf("%-10s %-52f %-52f%n", p.getNome(), p.getPrecoVenda(), p.getQtdAtual()));
 
             } else if (opt == 1) { // Mostra funcionário
                 var funcionarios = new FuncionarioDAO(conn).select();
                 System.out.printf("%-4s %-25s %-30s%n", "Id", "Nome", "Email");
-                funcionarios.forEach(
-                        func -> System.out.printf("%-4s %-25s %-15s%n", func.getId(), func.getNome(), func.getEmail()));
+                funcionarios.forEach(func -> System.out.printf("%-4s %-25s %-15s%n", func.getId(), func.getNome(), func.getEmail()));
             } else if (opt == 3) { // Cadastra produto
-                Map<Integer, String> funcionarios;
-                do {
-                    var email = scan.lerEmail("Digite seu email: ");
-                    var senha = scan.lerSenha("Digite sua senha: ");
-                    funcionarios = new FuncionarioDAO(conn).buscaFuncionario(email, senha);
-                    if (funcionarios.size() == 0) {
-                        System.out.println("Login incorreto ou duplicado\n");
-                    }
-                } while (funcionarios.size() != 1);
+                Map<Integer, String> funcionarios = loginFuncionario(scan, conn);
 
                 int idFunc = 0;
                 for (int id : funcionarios.keySet()) {
@@ -50,7 +46,6 @@ public class Main {
                     var produto = cadastraProduto(scan, idFunc);
                     rowAffect = new ProdutoDAO(conn).insert(produto);
                 } while (rowAffect == 0);
-
             } else if (opt == 4) { // Cadastra funcionário
                 int rowAffect;
                 do {
@@ -71,17 +66,44 @@ public class Main {
     }
 
     private static Produto cadastraProduto(Entrada scan, int idFunc) {
-        while (true) {
-            var nome = scan.lerString("Digite o nome do produto: ", "Nome inválido");
-            var precoCompra = scan.lerDouble("Digite o preço de compra: ");
-            var precoVenda = scan.lerDouble("Digite o preço de venda: ");
-            if (precoVenda <= precoCompra) {
-                System.out.println("Preço de venda não pode ser menor que o preço de compra\n");
+        var nome = scan.lerString("Digite o nome do produto: ", "Nome inválido");
+        double precoCompra = 0;
+        while (precoCompra <= 0) {
+            precoCompra = scan.lerDouble("Digite o preço de compra: ");
+            if (precoCompra <= 0) {
+                System.out.println("Preço de compra inválido\n");
                 continue;
             }
-            var qtdComprada = scan.lerInt("Digite a quantidade comprada: ");
-
-            return new Produto(nome, qtdComprada, precoCompra, precoVenda, idFunc);
         }
+        double precoVenda = 0;
+        while (precoVenda <= precoCompra) {
+            precoVenda = scan.lerDouble("Digite o preço de venda: ");
+            if (precoVenda <= precoCompra) {
+                System.out.println("Preço de venda não pode ser menor ou igual ao preço de compra\n");
+                continue;
+            }
+        }
+        double qtdComprada = 0;
+        while (qtdComprada <= 0) {
+            qtdComprada = scan.lerDouble("Digite a quantidade comprada: ");
+            if (qtdComprada <= 0) {
+                System.out.println("Quantidade comprada inválida\n");
+                continue;
+            }
+        }
+        return new Produto(0, idFunc, nome, precoCompra, precoVenda, qtdComprada, 0, qtdComprada);
+    }
+
+    private static Map<Integer, String> loginFuncionario(Entrada scan, Connection conn) {
+        Map<Integer, String> funcionarios;
+        do {
+            var email = scan.lerEmail("Digite seu email: ");
+            var senha = scan.lerSenha("Digite sua senha: ");
+            funcionarios = new FuncionarioDAO(conn).buscaFuncionario(email, senha);
+            if (funcionarios.size() == 0) {
+                System.out.println("Login incorreto ou duplicado\n");
+            }
+        } while (funcionarios.size() != 1);
+        return funcionarios;
     }
 }
