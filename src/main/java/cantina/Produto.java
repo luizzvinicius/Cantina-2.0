@@ -2,15 +2,18 @@ package cantina;
 
 public class Produto {
     String nome;
-    int codigo, qtdComprada, qtdVendida, qtdAtual, idFuncionario;
-    double precoCompra, precoVenda;
-    
-    public Produto(String nome, int qtdComprada, double precoCompra, double precoVenda, int idFuncionario) {
+    int codigo, idFuncionario;
+    double precoCompra, precoVenda, qtdComprada, qtdVendida, qtdAtual;
+
+    public Produto(int codigo, int idFuncionario, String nome, double precoCompra, double precoVenda, double qtdComprada, double qtdVendida, double qtdAtual) {
+        this.codigo = codigo;
+        this.idFuncionario = idFuncionario;
         this.nome = nome;
-        this.qtdComprada = qtdComprada;
         this.precoCompra = precoCompra;
         this.precoVenda = precoVenda;
-        this.idFuncionario = idFuncionario;
+        this.qtdComprada = qtdComprada;
+        this.qtdVendida = qtdVendida;
+        this.qtdAtual = qtdAtual;
     }
 
     public String getNome() {
@@ -21,15 +24,15 @@ public class Produto {
         return codigo;
     }
 
-    public int getQtdComprada() {
+    public double getQtdComprada() {
         return qtdComprada;
     }
 
-    public int getQtdVendida() {
+    public double getQtdVendida() {
         return qtdVendida;
     }
 
-    public int getQtdAtual() {
+    public double getQtdAtual() {
         return qtdAtual;
     }
 
