@@ -10,23 +10,47 @@ public class Entrada implements AutoCloseable {
         this.scan = new Scanner(System.in);
     }
 
-    public String lerString(String msg, String erroMessage) {
+    public String lerString(String msg, String errorMessage) {
+        var scan = System.console();
         String palavra;
         while (true) {
             System.out.print(msg);
-            palavra = this.scan.nextLine().strip();
-            if (!Pattern.matches("^[a-zA-ZÀ-ÿ\s]+$", palavra)) {
-                System.out.println(erroMessage + "\n");
+            palavra = scan.readLine().strip().toLowerCase();
+            if (!Pattern.matches("^[a-zÀ-ÿ\s]+$", palavra)) {
+                System.out.println(errorMessage + "\n");
                 continue;
             }
             return palavra;
         }
     }
 
+    public String lerEmail(String msg) {
+        var scan = System.console();
+        String email;
+        while (true) {
+            System.out.print(msg);
+            email = scan.readLine().strip().toLowerCase();
+            if (!Pattern.matches("^[A-Za-z0-9+_.-]+@(.+)$", email)) {
+                System.out.println("Formato de Email inválido" + "\n");
+                continue;
+            }
+            return email;
+        }
+    }
+
+    public char[] lerSenha(String msg) {
+        var scan = System.console();
+        while (true) {
+            System.out.print(msg);
+            var senha = scan.readPassword();
+            return senha;
+        }
+    }
+
     public int lerInt(String msg) {
         while (true) {
             System.out.print(msg);
-            var num = this.scan.nextLine().strip();
+            var num = this.scan.nextLine();
             try {
                 return Integer.parseInt(num);
             } catch (NumberFormatException e) {
@@ -38,7 +62,7 @@ public class Entrada implements AutoCloseable {
     public double lerDouble(String msg) {
         while (true) {
             System.out.print(msg);
-            var num = this.scan.nextLine().strip();
+            var num = this.scan.nextLine();
             try {
                 return Double.parseDouble(num);
             } catch (NumberFormatException e) {
