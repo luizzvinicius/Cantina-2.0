@@ -42,8 +42,8 @@ public class Entrada implements AutoCloseable {
         var scan = System.console();
         while (true) {
             System.out.print(msg);
-            var senha = scan.readLine().strip();
-            return senha;
+            var senha = scan.readPassword();
+            return new String(senha);
         }
     }
 
