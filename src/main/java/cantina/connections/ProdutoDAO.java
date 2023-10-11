@@ -38,8 +38,7 @@ public class ProdutoDAO {
     public List<Produto> select() {
         final String sql = "select * from produto";
         List<Produto> produtos = new ArrayList<>();
-        try (var stmt = this.conn.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
+        try (var stmt = this.conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 produtos.add(new Produto(
                     rs.getInt("codigo"),
@@ -56,5 +55,25 @@ public class ProdutoDAO {
             System.out.println("Não foi possível selecionar produto(s): " + e.getMessage() + "\n");
         }
         return produtos;
+    }
+
+    public int updatePreco(int optPreco, double novoPreco, int codigoProduto, int idFunc) {
+        final String sql = optPreco == 1 ? 
+        "update produto set preco_compra = ? where codigo = ?" : 
+        "update produto set preco_venda = ? where codigo = ?";
+        final String updateFK = "update produto set id_funcionario = ? where codigo = ?";
+        int rowsAffect = 0;
+        try (var stmt = this.conn.prepareStatement(sql); var stmt2 = this.conn.prepareStatement(updateFK)) {
+            stmt2.setInt(1, idFunc);
+            stmt2.setInt(2, codigoProduto);
+            stmt2.executeUpdate();
+            stmt.setDouble(1, novoPreco);
+            stmt.setDouble(2, codigoProduto);
+            rowsAffect = stmt.executeUpdate();
+            System.out.println("Preço alterado.");
+        } catch (SQLException e) {
+            System.out.println("Não foi possível alterar o preço: " + e.getMessage() + "\n");
+        }
+        return rowsAffect;
     }
 }
