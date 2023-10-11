@@ -5,35 +5,49 @@ import cantina.validacao.Entrada;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Map;
 
 // DriverManager, Conncection, ResultSet, Statement, PreparedStatement
 public class Main {
     public static void main(String[] args) {
         List<String> opcoes = new ArrayList<>(List.of(
-                "Mostrar cardápio", "Mostrar funcionários", "Mostrar produtos com estoque baixo",
+                "Mostrar cardápio", "Mostrar funcionários", "Mostrar produto ordenado pelo nome","Mostrar produtos com estoque baixo",
                 "Cadastrar produto", "Cadastrar funcionário",
-                "Alterar nome produto",
+                "Alterar preço do produto",
                 "Excluir produto", "Excluir funcionário"));
         
         try (var conn = ConnectionFactory.getConnection(); var scan = new Entrada()) {
             for (int i = 0; i < opcoes.size(); i++) {
-                System.out.printf("[ %d ] %s%n", i + 1, opcoes.get(i));
+                System.out.printf("[ %d ] %s%n", i+1, opcoes.get(i));
             }
 
             int opt = scan.lerOption("Opção: ", 1, opcoes.size(), "Opção inválida") - 1;
-            if (opt == 0) {
+            var brasil = Locale.of("pt", "BR");
+            if (opt == 0) { // Mostra cardápio
                 List<Produto> produtos = new ProdutoDAO(conn).select();
-                System.out.printf("%-10s %-5s %-5s%n", "Nome", "Preço", "Quantidade disponível");
-                produtos.forEach(p -> System.out.printf("%-10s %-52f %-52f%n", p.getNome(), p.getPrecoVenda(), p.getQtdAtual()));
-
+                System.out.printf("%n%-20s %-15s %-15s%n", "Nome", "Preço", "Quantidade disponível");
+                produtos.forEach(p -> System.out.printf("%-20s %-15s %-15.2f%n", p.getNome(), NumberFormat.getCurrencyInstance(brasil).format(p.getPrecoVenda()), p.getQtdAtual()));
             } else if (opt == 1) { // Mostra funcionário
                 var funcionarios = new FuncionarioDAO(conn).select();
                 System.out.printf("%-4s %-25s %-30s%n", "Id", "Nome", "Email");
                 funcionarios.forEach(func -> System.out.printf("%-4s %-25s %-15s%n", func.getId(), func.getNome(), func.getEmail()));
-            } else if (opt == 3) { // Cadastra produto
+            } else if (opt == 2) { // Mostra produto ordenado pelo nome
+                List<Produto> produtos = new ProdutoDAO(conn).select();
+                System.out.printf("%n%-20s %-15s %-15s%n", "Nome", "Preço", "Quantidade disponível");
+                produtos.stream().sorted(Comparator.comparing(Produto::getNome))
+                    .forEach(p -> System.out.printf("%-20s %-15s %-15.2f%n", p.getNome(), NumberFormat.getCurrencyInstance(brasil).format(p.getPrecoVenda()), p.getQtdAtual()));
+            } else if (opt == 3) { // Mostra Produto com estoque baixo
+                List<Produto> produtos = new ProdutoDAO(conn).select();
+                System.out.printf("%n%-20s %-15s%n", "Nome", "Quantidade disponível");
+                
+                produtos.stream().filter(produto -> produto.getQtdAtual() <= 50)
+                .forEach(produto -> System.out.printf("%-20s %-15.2f%n", produto.getNome(), produto.getQtdAtual()));
+            } else if (opt == 4) { // Cadastra produto
                 Map<Integer, String> funcionarios = loginFuncionario(scan, conn);
 
                 int idFunc = 0;
@@ -41,17 +55,48 @@ public class Main {
                     idFunc = id;
                 }
 
-                int rowAffect;
-                do {
+                int rowAffect = 0;
+                while (rowAffect == 0) {
                     var produto = cadastraProduto(scan, idFunc);
                     rowAffect = new ProdutoDAO(conn).insert(produto);
-                } while (rowAffect == 0);
-            } else if (opt == 4) { // Cadastra funcionário
-                int rowAffect;
-                do {
+                }
+            } else if (opt == 5) { // Cadastra funcionário
+                int rowAffect = 0;
+                while (rowAffect == 0) {
                     var funcionario = cadastraFuncionario(scan);
                     rowAffect = new FuncionarioDAO(conn).insert(funcionario);
-                } while (rowAffect == 0);
+                }
+            } else if (opt == 6) {
+                Map<Integer, String> funcionario = loginFuncionario(scan, conn);
+                int idFunc = 0;
+                for (int id : funcionario.keySet()) {
+                    idFunc = id;
+                }
+
+                List<Produto> produtos = new ProdutoDAO(conn).select();
+                System.out.printf("%n%-10s %-20s %-20s %-10s%n", "Código", "Nome", "Preço de compra", "Preço de venda");
+                produtos.forEach(p -> System.out.printf("%-10d %-20s %-20s %-10s%n", p.getCodigo(), p.getNome(), NumberFormat.getCurrencyInstance(brasil).format(p.getPrecoCompra()), NumberFormat.getCurrencyInstance(brasil).format(p.getPrecoVenda())));
+                
+                Produto produto = null;
+                while (produto == null) { // Garantido que não vai ser nulo
+                    var codigo = scan.lerInt("Digite o código do produto: ");
+                    for (Produto p : produtos) {
+                        if (p.getCodigo() == codigo) {
+                            produto = p;
+                            break;
+                        }
+                    }
+                    System.out.println("Produto não encontrado.\n");
+                }
+                var optPreco = scan.lerOption("Você quer alterar o [ 1 ] preço de compra ou [ 2 ] preço de venda? ", 1, 2, "Tipo de preço inválido");
+                var novoPreco = scan.lerDouble("Digite o novo preço: ");
+                new ProdutoDAO(conn).updatePreco(optPreco, novoPreco, produto.getCodigo(), idFunc);
+
+            } else if (opt == 7) {
+
+            } else if (opt == 8) {
+                var email = scan.lerEmail("Digite o email do funcionário: ");
+                new FuncionarioDAO(conn).excluirFuncionario(email);
             }
         } catch (SQLException e) {
             System.out.println("Conexão vazia: " + e.getMessage());
