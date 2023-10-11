@@ -32,7 +32,7 @@ public class FuncionarioDAO {
     }
 
     public List<Funcionario> select() {
-        final String sql = "select id, nome, email from funcionario";
+        final String sql = "select id, nome, email from funcionario where email is not null";
         List<Funcionario> funcionarios = new ArrayList<>();
         try (var stmt = this.conn.prepareStatement(sql)) {
             ResultSet rs = stmt.executeQuery();
@@ -59,5 +59,17 @@ public class FuncionarioDAO {
             System.out.println("Erro ao selecionar funcionário(s): " + e.getMessage());
         }
         return funcionarios;
+    }
+
+    public void excluirFuncionario(String email) {
+        final String sql = "update funcionario set email = null where email = ?";
+        int rowsAffect = 0;
+        try (var stmt = this.conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            rowsAffect = stmt.executeUpdate();
+            System.out.println(rowsAffect + " funcionário excluído.");
+        } catch (Exception e) {
+            System.out.println("Erro ao excluir funcionário: " + e.getMessage() + "\n");
+        }
     }
 }
