@@ -37,12 +37,4 @@ public class Venda {
     public LocalDateTime getData() {
         return data;
     }
-
-    public void setFormaPagamento(String formaPagamento) {
-        this.formaPagamento = formaPagamento;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
-    }
 }

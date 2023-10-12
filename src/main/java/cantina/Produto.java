@@ -47,24 +47,4 @@ public class Produto {
     public int getIdFuncionario() {
         return idFuncionario;
     }
-
-    public void setIdFuncionario(int idFuncionario) {
-        this.idFuncionario = idFuncionario;
-    }
-
-    public void setQtdVendida(double qtdVendida) {
-        this.qtdVendida = qtdVendida;
-    }
-
-    public void setQtdAtual(double qtdAtual) {
-        this.qtdAtual = qtdAtual;
-    }
-
-    public void setPrecoCompra(double precoCompra) {
-        this.precoCompra = precoCompra;
-    }
-
-    public void setPrecoVenda(double precoVenda) {
-        this.precoVenda = precoVenda;
-    }
 }
