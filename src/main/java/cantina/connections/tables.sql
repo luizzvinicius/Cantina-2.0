@@ -27,11 +27,10 @@ CREATE TABLE IF NOT EXISTS venda (
     codigo INT(8) AUTO_INCREMENT,
     id_funcionario INT(8) NOT NULL,
     desconto Decimal(14,2) NOT NULL,
-    total_venda Decimal(14,2) NOT NULL,
-    forma_pagamento VARCHAR(25) NOT NULL,
-    data DATE NOT NULL,
+    total_venda Decimal(14,2),
+    forma_pagamento VARCHAR(25),
+    data TIMESTAMP NOT NULL,
     CHECK (desconto >= 0),
-    CHECK (total_venda > 0),
     PRIMARY KEY (codigo),
     FOREIGN KEY (id_funcionario) REFERENCES funcionario(id)
 );
