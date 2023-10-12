@@ -1,10 +1,10 @@
 package cantina.connections;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 import cantina.Produto;
 
@@ -28,7 +28,7 @@ public class ProdutoDAO {
             stmt.setDouble(7, p.getQtdVendida());
             stmt.setDouble(8, p.getQtdComprada());
             rowsAffect = stmt.executeUpdate();
-            System.out.println("Produto inserido.");
+            System.out.println(rowsAffect + " Produto inserido.");
         } catch (SQLException e) {
             System.out.println("Não foi possível inserir o produto: " + e.getMessage() + "\n");
         }
@@ -38,7 +38,7 @@ public class ProdutoDAO {
     public List<Produto> select() {
         final String sql = "select * from produto";
         List<Produto> produtos = new ArrayList<>();
-        try (var stmt = this.conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+        try (var stmt = this.conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
             while (rs.next()) {
                 produtos.add(new Produto(
                     rs.getInt("codigo"),
@@ -46,10 +46,10 @@ public class ProdutoDAO {
                     rs.getString("nome"), 
                     rs.getDouble("preco_compra"),
                     rs.getDouble("preco_venda"),
-                    rs.getInt("quantidade_comprada"),
-                    rs.getInt("quantidade_vendida"),
-                    rs.getInt("quantidade_atual")
-                    ));
+                    rs.getDouble("quantidade_comprada"),
+                    rs.getDouble("quantidade_vendida"),
+                    rs.getDouble("quantidade_atual")
+                ));
             }
         } catch (SQLException e) {
             System.out.println("Não foi possível selecionar produto(s): " + e.getMessage() + "\n");
@@ -57,7 +57,7 @@ public class ProdutoDAO {
         return produtos;
     }
 
-    public int updatePreco(int optPreco, double novoPreco, int codigoProduto, int idFunc) {
+    public void updatePreco(int optPreco, double novoPreco, int codigoProduto, int idFunc) {
         final String sql = optPreco == 1 ? 
         "update produto set preco_compra = ? where codigo = ?" : 
         "update produto set preco_venda = ? where codigo = ?";
@@ -68,12 +68,39 @@ public class ProdutoDAO {
             stmt2.setInt(2, codigoProduto);
             stmt2.executeUpdate();
             stmt.setDouble(1, novoPreco);
-            stmt.setDouble(2, codigoProduto);
+            stmt.setInt(2, codigoProduto);
             rowsAffect = stmt.executeUpdate();
-            System.out.println("Preço alterado.");
+            System.out.println(rowsAffect + " preço(s) alterado(s).");
         } catch (SQLException e) {
             System.out.println("Não foi possível alterar o preço: " + e.getMessage() + "\n");
         }
-        return rowsAffect;
+    }
+
+    public void adicionaQuantidade(double quantidade, int codigoProduto, int idFunc) {
+        final String sql = "update produto set quantidade_comprada = ? where codigo = ?";
+        final String updateFK = "update produto set id_funcionario = ? where codigo = ?";
+        try (var stmt = this.conn.prepareStatement(sql); var stmt2 = this.conn.prepareStatement(updateFK)) {
+            stmt.setInt(1, codigoProduto);
+            stmt.setDouble(2, quantidade);
+            stmt.executeUpdate();
+            stmt2.setInt(1, idFunc);
+            stmt2.setInt(2, codigoProduto);
+            stmt2.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Não foi possível adicionar quantidade: " + e.getMessage() + "\n");
+        }
+    }
+
+    public void updateQuantidadePosVenda(int codProduto, double qtdVendida, double qtdAtual, int idFunc) {
+        final String sql = "update produto set quantidade_vendida = ?, quantidade_atual = ?, id_funcionario = ? where codigo = ?";
+        try (var stmt = this.conn.prepareStatement(sql)) {
+            stmt.setDouble(1, qtdVendida);
+            stmt.setDouble(2, qtdAtual);
+            stmt.setInt(3, idFunc);
+            stmt.setInt(4, codProduto);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Não foi possível atualizar a quantidade: " + e.getMessage() + "\n");
+        }
     }
 }

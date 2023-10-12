@@ -52,11 +52,11 @@ public class Produto {
         this.idFuncionario = idFuncionario;
     }
 
-    public void setQtdVendida(int qtdVendida) {
+    public void setQtdVendida(double qtdVendida) {
         this.qtdVendida = qtdVendida;
     }
 
-    public void setQtdAtual(int qtdAtual) {
+    public void setQtdAtual(double qtdAtual) {
         this.qtdAtual = qtdAtual;
     }
 
