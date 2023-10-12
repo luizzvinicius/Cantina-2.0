@@ -3,7 +3,6 @@ package cantina.connections;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 
 import cantina.Produto;
