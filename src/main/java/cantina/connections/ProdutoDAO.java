@@ -35,7 +35,7 @@ public class ProdutoDAO {
     }
 
     public List<Produto> select() {
-        final String sql = "select * from produto";
+        final String sql = "select * from produto where quantidade_atual > 0";
         List<Produto> produtos = new ArrayList<>();
         try (var stmt = this.conn.prepareStatement(sql); var rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -51,7 +51,7 @@ public class ProdutoDAO {
                 ));
             }
         } catch (SQLException e) {
-            System.out.println("Não foi possível selecionar produto(s): " + e.getMessage() + "\n");
+            System.out.printf("Não foi possível selecionar produto(s): %s%n%n", e.getMessage());
         }
         return produtos;
     }
@@ -71,20 +71,22 @@ public class ProdutoDAO {
             rowsAffect = stmt.executeUpdate();
             System.out.println(rowsAffect + " preço(s) alterado(s).");
         } catch (SQLException e) {
-            System.out.println("Não foi possível alterar o preço: " + e.getMessage() + "\n");
+            System.out.printf("Não foi possível alterar o preço: %s%n%n", e.getMessage());
         }
     }
 
-    public void adicionaQuantidade(double quantidade, int codigoProduto, int idFunc) {
-        final String sql = "update produto set quantidade_comprada = ? where codigo = ?";
+    public void adicionaQuantidade(Produto produto, double quantidade, int idFunc) {
+        final String sql = "update produto set quantidade_comprada = ?, quantidade_atual = ? where codigo = ?";
         final String updateFK = "update produto set id_funcionario = ? where codigo = ?";
         try (var stmt = this.conn.prepareStatement(sql); var stmt2 = this.conn.prepareStatement(updateFK)) {
-            stmt.setInt(1, codigoProduto);
-            stmt.setDouble(2, quantidade);
+            stmt.setDouble(1, produto.qtdComprada() + quantidade);
+            stmt.setDouble(2, produto.qtdAtual() + quantidade);
+            stmt.setInt(3, produto.codigo());
             stmt.executeUpdate();
             stmt2.setInt(1, idFunc);
-            stmt2.setInt(2, codigoProduto);
+            stmt2.setInt(2, produto.codigo());
             stmt2.executeUpdate();
+            System.out.println(quantidade + " adicionada ao produto de código: " + produto.codigo());
         } catch (SQLException e) {
             System.out.println("Não foi possível adicionar quantidade: " + e.getMessage() + "\n");
         }
@@ -98,7 +100,7 @@ public class ProdutoDAO {
             stmt.setInt(3, idFunc);
             stmt.setInt(4, codProduto);
             stmt.executeUpdate();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Não foi possível atualizar a quantidade: " + e.getMessage() + "\n");
         }
     }

@@ -42,8 +42,8 @@ public class VendaDAO {
             stmt.setDouble(2, total);
             stmt.setInt(3, codVenda);
             stmt.executeUpdate();
-        } catch (Exception e) {
-            System.out.println("Não foi possível atualizar venda: " + e.getMessage() + "\n");
+        } catch (SQLException e) {
+            System.out.printf("Não foi possível atualizar venda: %s%n%n", e.getMessage());
         }
     }
 }

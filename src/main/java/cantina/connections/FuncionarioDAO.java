@@ -1,11 +1,9 @@
 package cantina.connections;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
 import cantina.Funcionario;
 
@@ -25,7 +23,7 @@ public class FuncionarioDAO {
             stmt.setString(3, func.senha());
             rows = stmt.executeUpdate();
             System.out.println("Funcionário inserido.");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Erro ao cadastrar funcionário: " + e.getMessage() + "\n");
         }
         return rows;
@@ -35,40 +33,41 @@ public class FuncionarioDAO {
         final String sql = "select id, nome, email from funcionario where email is not null";
         List<Funcionario> funcionarios = new ArrayList<>();
         try (var stmt = this.conn.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
+            var rs = stmt.executeQuery();
             while (rs.next()) {
                 funcionarios.add(new Funcionario(rs.getInt("id"), rs.getString("nome"), rs.getString("email"), null));
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Erro ao selecionar funcionário(s): " + e.getMessage());
         }
         return funcionarios;
     }
 
-    public Map<Integer, String> buscaFuncionario(String email, String senha) {
+    public Funcionario buscaFuncionario(String email, String senha) {
         final String sql = "select id, nome from funcionario where email = ? and senha = ?";
-        Map<Integer, String> funcionarios = new HashMap<>();
+        var id = 0;
+        var nome = "";
         try (var stmt = this.conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             stmt.setString(2, senha);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                funcionarios.put(rs.getInt("id"), rs.getString("nome"));
-            }
-        } catch (Exception e) {
+            var rs = stmt.executeQuery();
+            rs.next();
+            id = rs.getInt("id");
+            nome = rs.getString("nome");
+        } catch (SQLException e) {
             System.out.println("Erro ao selecionar funcionário(s): " + e.getMessage());
         }
-        return funcionarios;
+        return new Funcionario(id, nome, null, null);
     }
 
     public void excluirFuncionario(String email) {
-        final String sql = "update funcionario set email = null where email = ?";
+        final String sql = "update funcionario set email = null, senha = null where email = ?";
         int rowsAffect = 0;
         try (var stmt = this.conn.prepareStatement(sql)) {
             stmt.setString(1, email);
             rowsAffect = stmt.executeUpdate();
             System.out.println(rowsAffect + " funcionário excluído.");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Erro ao excluir funcionário: " + e.getMessage() + "\n");
         }
     }

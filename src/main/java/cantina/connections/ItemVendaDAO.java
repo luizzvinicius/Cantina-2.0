@@ -22,6 +22,7 @@ public class ItemVendaDAO {
             stmt.setDouble(4, item.preco());
             stmt.setDouble(5, item.quantidade());
             rowsAffect = stmt.executeUpdate();
+            System.out.println(rowsAffect + " item da venda inserido");
         } catch (SQLException e) {
             System.out.println("Não foi possível inserir o item: " + e.getMessage() + "\n");
         }
