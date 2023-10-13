@@ -18,12 +18,12 @@ public class VendaDAO {
         final String sql = "insert into venda (codigo, id_funcionario, desconto, total_venda, forma_pagamento, data) values (?,?,?,?,?,?)";
         int codigoVenda = 0;
         try (var stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, v.getCodigoVenda());
-            stmt.setInt(2, v.getIdFuncionario());
-            stmt.setDouble(3, v.getDesconto());
-            stmt.setDouble(4, v.getTotal());
-            stmt.setString(5, v.getFormaPagamento());
-            stmt.setTimestamp(6, Timestamp.valueOf(v.getData()));
+            stmt.setInt(1, v.codigoVenda());
+            stmt.setInt(2, v.idFuncionario());
+            stmt.setDouble(3, v.desconto());
+            stmt.setDouble(4, v.total());
+            stmt.setString(5, v.formaPagamento());
+            stmt.setTimestamp(6, Timestamp.valueOf(v.data()));
             stmt.executeUpdate();
 
             var result = stmt.getGeneratedKeys();

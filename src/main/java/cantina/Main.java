@@ -43,7 +43,7 @@ public class Main {
     public static void venderProduto(Connection conn, Entrada scan) {
         var funcionario = loginFuncionario(scan, conn);
         var idFunc = funcionario.id();
-        var venda = new Venda(idFunc, new Random().nextDouble(0, 11) / 100, LocalDateTime.now());
+        var venda = new Venda(0, idFunc, new Random().nextDouble(0, 11) / 100, null, 0, LocalDateTime.now());
         var codVenda = new VendaDAO(conn).insert(venda);
         
         List<Produto> produtos = new ProdutoDAO(conn).select();
@@ -99,7 +99,7 @@ public class Main {
             System.out.printf("%-15s %-10.2f %-5s%n", produto.getKey(), itemVenda.quantidade(), itemVenda.quantidade() * itemVenda.preco());
             total += itemVenda.quantidade() * itemVenda.preco();
         }
-        System.out.printf("Total da venda: %s com desconto de : %s%n", NumberFormat.getCurrencyInstance(brasil).format(total - (total * venda.getDesconto())), NumberFormat.getCurrencyInstance(brasil).format(total * venda.getDesconto()));
+        System.out.printf("Total da venda: %s com desconto de : %s%n", NumberFormat.getCurrencyInstance(brasil).format(total - (total * venda.desconto())), NumberFormat.getCurrencyInstance(brasil).format(total * venda.desconto()));
         new VendaDAO(conn).updateVenda(codVenda, formaPagamento, total);
         total = 0;
     }
