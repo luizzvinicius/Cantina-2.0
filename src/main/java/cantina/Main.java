@@ -16,7 +16,7 @@ public class Main {
             "Mostrar produto ordenado pelo nome", "Mostrar produtos com estoque baixo", "Cadastrar produto", 
             "Cadastrar funcionário", "Alterar preço do produto", "Adicionar quantidade a um produto", "Excluir funcionário", "Sair"
         };
-        var metodos = new opcoes[] {
+        var metodos = new metodos[] {
             Main::venderProduto, Main::mostrarCardapio, Main::mostrarFuncionario, Main::mostrarProdutoNome, Main::mostrarProdutoEmFalta, Main::cadastrarProduto, Main::cadastrarFuncionario, Main::alterarPreco, Main::adicionarQuantidade, Main::excluirFuncionario, Main::sair
         };
 
@@ -24,20 +24,20 @@ public class Main {
             for (int i = 0; i < listaOpcoes.length; i++) {
                 System.out.printf("[ %d ] %s%n", i+1, listaOpcoes[i]);
             }
-            
+
             var opt = 0;
             while (opt != listaOpcoes.length - 1) {
                 opt = scan.lerOption("Opção: ", 1, listaOpcoes.length, "Opção inválida") - 1;
-                metodos[opt].executar(conn, scan);
+                metodos[opt].accept(conn, scan);
             }
         } catch (SQLException e) {
             System.out.println("Conexão vazia: " + e.getMessage());
         }
     }
-    
+
     @FunctionalInterface
-    public interface opcoes {
-        void executar(Connection conn, Entrada scan);
+    public interface metodos {
+        void accept(Connection conn, Entrada scan);
     }
 
     public static void venderProduto(Connection conn, Entrada scan) {
@@ -59,7 +59,7 @@ public class Main {
         while (continuar.equalsIgnoreCase("s")) {
             List<Produto> produtos2 = new ProdutoDAO(conn).select();
             var produtoSelecionado = selecionarProdutoPorCodigo(scan, produtos2);
-            
+
             int quantidade = 0;
             while (true) {
                 quantidade = scan.lerInt("Digite a quantidade: ");
@@ -103,10 +103,10 @@ public class Main {
         new VendaDAO(conn).updateVenda(codVenda, formaPagamento, total);
         total = 0;
     }
-    
+
     // public static void mostrarResumo(Connection conn, Entrada scan) {
     // }
-    
+
     public static void mostrarCardapio(Connection conn, Entrada scan) {
         List<Produto> produtos = new ProdutoDAO(conn).select();
         System.out.printf("%n%-20s %-15s %-15s%n", "Nome", "Preço", "Quantidade disponível");
@@ -153,7 +153,7 @@ public class Main {
             rowAffect = new FuncionarioDAO(conn).insert(new Funcionario(0, nome, email, senha));
         }
     }
-    
+
     public static void alterarPreco(Connection conn, Entrada scan) {
         var funcionario = loginFuncionario(scan, conn);
         var idFunc = funcionario.id();
