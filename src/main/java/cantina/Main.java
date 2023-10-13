@@ -57,7 +57,7 @@ public class Main {
             return;
         }
         System.out.printf("%n%-10s %-20s %-20s%n", "Código", "Nome", "Quantidade disponível");
-        produtos.forEach(p -> System.out.printf("%-10d %-20s %-10.2f%n", p.getCodigo(), p.getNome(), p.getQtdAtual()));
+        produtos.forEach(p -> System.out.printf("%-10d %-20s %-10.2f%n", p.codigo(), p.nome(), p.qtdAtual()));
 
         Map<String, ItemVenda> carrinho = new HashMap<>();
         var continuar = "s";
@@ -67,18 +67,18 @@ public class Main {
             int quantidade = 0;
             while (true) {
                 quantidade = scan.lerInt("Digite a quantidade: ");
-                if (quantidade <= produtoSelecionado.getQtdAtual()) {
+                if (quantidade <= produtoSelecionado.qtdAtual()) {
                     break;
                 }
                 System.out.println("Quantidade maior que a disponível.");
             }
-            new ProdutoDAO(conn).updateQuantidadePosVenda(produtoSelecionado.getCodigo(), produtoSelecionado.getQtdVendida() + quantidade, produtoSelecionado.getQtdAtual() - quantidade, idFunc);
+            new ProdutoDAO(conn).updateQuantidadePosVenda(produtoSelecionado.codigo(), produtoSelecionado.qtdVendida() + quantidade, produtoSelecionado.qtdAtual() - quantidade, idFunc);
 
-            var item = new ItemVenda(0, codVenda, produtoSelecionado.getCodigo(), quantidade, produtoSelecionado.getPrecoVenda());
+            var item = new ItemVenda(0, codVenda, produtoSelecionado.codigo(), quantidade, produtoSelecionado.precoVenda());
             
             int rowAffect = new ItemVendaDAO(conn).insert(item, codVenda);
             if (rowAffect == 0) {continue;}
-            carrinho.put(produtoSelecionado.getNome(), item);
+            carrinho.put(produtoSelecionado.nome(), item);
             while (true) {
                 continuar = scan.lerString("Quer continuar [S/N]? ", "Opção inválida.");
                 if (!continuar.equalsIgnoreCase("s") && !continuar.equalsIgnoreCase("n")) {
@@ -100,8 +100,8 @@ public class Main {
         System.out.printf("%-15s %-10s %-5s%n", "Nome", "Quantidade", "Preço");
         for (Map.Entry<String, ItemVenda> produto : carrinho.entrySet()) {
             var itemVenda = produto.getValue();
-            System.out.printf("%-15s %-10.2f %-5s%n", produto.getKey(), itemVenda.getQuantidade(), itemVenda.getQuantidade() * itemVenda.getPreco());
-            total += itemVenda.getQuantidade() * itemVenda.getPreco();
+            System.out.printf("%-15s %-10.2f %-5s%n", produto.getKey(), itemVenda.quantidade(), itemVenda.quantidade() * itemVenda.preco());
+            total += itemVenda.quantidade() * itemVenda.preco();
         }
         System.out.printf("Total da venda: %s com desconto de : %s", NumberFormat.getCurrencyInstance(brasil).format(total * venda.getDesconto()), NumberFormat.getCurrencyInstance(brasil).format(venda.getDesconto()));
         new VendaDAO(conn).updateVenda(codVenda, formaPagamento, total);
@@ -114,27 +114,27 @@ public class Main {
     public static void mostraCardapio(Connection conn, Entrada scan) {
         List<Produto> produtos = new ProdutoDAO(conn).select();
         System.out.printf("%n%-20s %-15s %-15s%n", "Nome", "Preço", "Quantidade disponível");
-        produtos.forEach(p -> System.out.printf("%-20s %-15s %-15.2f%n", p.getNome(), NumberFormat.getCurrencyInstance(brasil).format(p.getPrecoVenda()), p.getQtdAtual()));
+        produtos.forEach(p -> System.out.printf("%-20s %-15s %-15.2f%n", p.nome(), NumberFormat.getCurrencyInstance(brasil).format(p.precoVenda()), p.qtdAtual()));
     }
     
     public static void mostraFuncionario(Connection conn, Entrada scan) {
         var funcionarios = new FuncionarioDAO(conn).select();
         System.out.printf("%-4s %-25s %-30s%n", "Id", "Nome", "Email");
-        funcionarios.forEach(func -> System.out.printf("%-4s %-25s %-15s%n", func.getId(), func.getNome(), func.getEmail()));
+        funcionarios.forEach(func -> System.out.printf("%-4s %-25s %-15s%n", func.id(), func.nome(), func.email()));
     }
     
     public static void mostraProdutoNome(Connection conn, Entrada scan) {
         List<Produto> produtos = new ProdutoDAO(conn).select();
         System.out.printf("%n%-20s %-15s %-15s%n", "Nome", "Preço", "Quantidade disponível");
-        produtos.stream().sorted(Comparator.comparing(Produto::getNome))
-            .forEach(p -> System.out.printf("%-20s %-15s %-15.2f%n", p.getNome(), NumberFormat.getCurrencyInstance(brasil).format(p.getPrecoVenda()), p.getQtdAtual()));
+        produtos.stream().sorted(Comparator.comparing(Produto::nome))
+            .forEach(p -> System.out.printf("%-20s %-15s %-15.2f%n", p.nome(), NumberFormat.getCurrencyInstance(brasil).format(p.precoVenda()), p.qtdAtual()));
     }
     
     public static void mostraProdutoEmFalta(Connection conn, Entrada scan) {
         List<Produto> produtos = new ProdutoDAO(conn).select();
         System.out.printf("%n%-20s %-15s%n", "Nome", "Quantidade disponível");
-        produtos.stream().filter(produto -> produto.getQtdAtual() <= 50)
-           .forEach(produto -> System.out.printf("%-20s %-15.2f%n", produto.getNome(), produto.getQtdAtual()));
+        produtos.stream().filter(produto -> produto.qtdAtual() <= 50)
+           .forEach(produto -> System.out.printf("%-20s %-15.2f%n", produto.nome(), produto.qtdAtual()));
     }
     
     public static void cadastraProduto(Connection conn, Entrada scan) {
@@ -170,12 +170,12 @@ public class Main {
 
         List<Produto> produtos = new ProdutoDAO(conn).select();
         System.out.printf("%n%-10s %-20s %-20s %-20s %-10s%n", "Código", "Nome", "Preço de compra", "Preço de venda", "Quantidade disponível");
-        produtos.forEach(p -> System.out.printf("%-10d %-20s %-20s %-10s%n", p.getCodigo(), p.getNome(), NumberFormat.getCurrencyInstance(brasil).format(p.getPrecoCompra()), NumberFormat.getCurrencyInstance(brasil).format(p.getPrecoVenda()), p.getQtdComprada()));
+        produtos.forEach(p -> System.out.printf("%-10d %-20s %-20s %-10s%n", p.codigo(), p.nome(), NumberFormat.getCurrencyInstance(brasil).format(p.precoCompra()), NumberFormat.getCurrencyInstance(brasil).format(p.precoVenda()), p.qtdComprada()));
 
         var produto = selecionaProdutoPorCodigo(scan, produtos);
         var optPreco = scan.lerOption("Você quer alterar o [ 1 ] preço de compra ou [ 2 ] preço de venda? ", 1, 2, "Tipo de preço inválido");
         var novoPreco = scan.lerDouble("Digite o novo preço: ");
-        new ProdutoDAO(conn).updatePreco(optPreco, novoPreco, produto.getCodigo(), idFunc);
+        new ProdutoDAO(conn).updatePreco(optPreco, novoPreco, produto.codigo(), idFunc);
     }
     
     public static void adicionarQuantidade(Connection conn, Entrada scan) {
@@ -187,10 +187,10 @@ public class Main {
 
         List<Produto> produtos = new ProdutoDAO(conn).select();
         System.out.printf("%n%-10s %-20s %-20s%n", "Código", "Nome", "Quantidade atual");
-        produtos.forEach(p -> System.out.printf("%-10d %-20s %-10.2f%n", p.getCodigo(), p.getNome(), p.getQtdAtual()));
+        produtos.forEach(p -> System.out.printf("%-10d %-20s %-10.2f%n", p.codigo(), p.nome(), p.qtdAtual()));
         var produto = selecionaProdutoPorCodigo(scan, produtos);
         var quantidadeComprada = scan.lerDouble("Digite a quantidade a adicionar: ");
-        new ProdutoDAO(conn).adicionaQuantidade(quantidadeComprada, produto.getCodigo(), idFunc);
+        new ProdutoDAO(conn).adicionaQuantidade(quantidadeComprada, produto.codigo(), idFunc);
     }
     
     public static void excluirFuncionario(Connection conn, Entrada scan) {
@@ -248,7 +248,7 @@ public class Main {
         while (produto == null) { // Garantido que não vai ser nulo
             var codigo = scan.lerInt("Digite o código do produto: ");
             for (Produto p : produtos) {
-                if (p.getCodigo() == codigo) {
+                if (p.codigo() == codigo) {
                     produto = p;
                     break;
                 }

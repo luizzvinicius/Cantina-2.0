@@ -18,14 +18,14 @@ public class ProdutoDAO {
         final String sql = "insert into produto (codigo, id_funcionario, nome, preco_compra, preco_venda, quantidade_comprada, quantidade_vendida, quantidade_atual) values (?, ?, ?, ?, ?, ?, ?, ?)";
         int rowsAffect = 0;
         try (var stmt = this.conn.prepareStatement(sql)) {
-            stmt.setInt(1, p.getCodigo());
-            stmt.setInt(2, p.getIdFuncionario());
-            stmt.setString(3, p.getNome());
-            stmt.setDouble(4, p.getPrecoCompra());
-            stmt.setDouble(5, p.getPrecoVenda());
-            stmt.setDouble(6, p.getQtdComprada());
-            stmt.setDouble(7, p.getQtdVendida());
-            stmt.setDouble(8, p.getQtdComprada());
+            stmt.setInt(1, p.codigo());
+            stmt.setInt(2, p.idFuncionario());
+            stmt.setString(3, p.nome());
+            stmt.setDouble(4, p.precoCompra());
+            stmt.setDouble(5, p.precoVenda());
+            stmt.setDouble(6, p.qtdComprada());
+            stmt.setDouble(7, p.qtdVendida());
+            stmt.setDouble(8, p.qtdComprada());
             rowsAffect = stmt.executeUpdate();
             System.out.println(rowsAffect + " Produto inserido.");
         } catch (SQLException e) {

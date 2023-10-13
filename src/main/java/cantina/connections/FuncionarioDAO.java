@@ -20,9 +20,9 @@ public class FuncionarioDAO {
         final String sql = "insert into funcionario (nome, email, senha) values (?, ?, ?)";
         int rows = 0;
         try (var stmt = this.conn.prepareStatement(sql)) {
-            stmt.setString(1, func.getNome());
-            stmt.setString(2, func.getEmail());
-            stmt.setString(3, func.getSenha());
+            stmt.setString(1, func.nome());
+            stmt.setString(2, func.email());
+            stmt.setString(3, func.senha());
             rows = stmt.executeUpdate();
             System.out.println("Funcionário inserido.");
         } catch (Exception e) {

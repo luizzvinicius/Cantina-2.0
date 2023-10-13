@@ -16,11 +16,11 @@ public class ItemVendaDAO {
         final String sql = "insert into item_venda (codigo_item, codigo_produto, codigo_venda, preco_venda, quantidade) values (?,?,?,?,?)";
         int rowsAffect = 0;
         try (var stmt = this.conn.prepareStatement(sql)) {
-            stmt.setInt(1, item.getCodigoItem());
-            stmt.setInt(2, item.getCodigoProduto());
+            stmt.setInt(1, item.codigoItem());
+            stmt.setInt(2, item.codigoProduto());
             stmt.setInt(3, codVenda);
-            stmt.setDouble(4, item.getPreco());
-            stmt.setDouble(5, item.getQuantidade());
+            stmt.setDouble(4, item.preco());
+            stmt.setDouble(5, item.quantidade());
             rowsAffect = stmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Não foi possível inserir o item: " + e.getMessage() + "\n");
