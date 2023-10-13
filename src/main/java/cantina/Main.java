@@ -12,12 +12,12 @@ public class Main {
     static Locale brasil = Locale.of("pt", "BR");
     public static void main(String[] args) {
         var listaOpcoes = new String[] {
-            "Vender Produto", "Mostrar resumo (dia / mês)", "Mostrar cardápio", "Mostrar funcionários", 
+            "Vender Produto", "Mostrar cardápio", "Mostrar funcionários", 
             "Mostrar produto ordenado pelo nome", "Mostrar produtos com estoque baixo", "Cadastrar produto", 
             "Cadastrar funcionário", "Alterar preço do produto", "Adicionar quantidade a um produto", "Excluir funcionário", "Sair"
         };
         var metodos = new opcoes[] {
-            Main::venderProduto, Main::mostrarResumo, Main::mostrarCardapio, Main::mostrarFuncionario, Main::mostrarProdutoNome, Main::mostrarProdutoEmFalta, Main::cadastrarProduto, Main::cadastrarFuncionario, Main::alterarPreco, Main::adicionarQuantidade, Main::excluirFuncionario, Main::sair
+            Main::venderProduto, Main::mostrarCardapio, Main::mostrarFuncionario, Main::mostrarProdutoNome, Main::mostrarProdutoEmFalta, Main::cadastrarProduto, Main::cadastrarFuncionario, Main::alterarPreco, Main::adicionarQuantidade, Main::excluirFuncionario, Main::sair
         };
 
         try (var conn = ConnectionFactory.getConnection(); var scan = new Entrada()) {
@@ -47,7 +47,7 @@ public class Main {
         var codVenda = new VendaDAO(conn).insert(venda);
         
         List<Produto> produtos = new ProdutoDAO(conn).select();
-        if(produtos.size() == 0) {
+        if (produtos.size() == 0) {
             System.out.println("Nenhum produdo disponível");
             return;
         }
@@ -104,9 +104,8 @@ public class Main {
         total = 0;
     }
     
-    public static void mostrarResumo(Connection conn, Entrada scan) {
-        
-    }
+    // public static void mostrarResumo(Connection conn, Entrada scan) {
+    // }
     
     public static void mostrarCardapio(Connection conn, Entrada scan) {
         List<Produto> produtos = new ProdutoDAO(conn).select();
