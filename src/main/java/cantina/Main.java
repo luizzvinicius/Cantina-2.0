@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 public class Main {
     static Locale brasil = Locale.of("pt", "BR");
+    // static Locale brasil = new Locale("pt", "BR");
     public static void main(String[] args) {
         var listaOpcoes = new String[] {
             "Vender Produto", "Mostrar cardápio", "Mostrar funcionários", 
@@ -160,7 +161,7 @@ public class Main {
 
         List<Produto> produtos = new ProdutoDAO(conn).select();
         System.out.printf("%n%-10s %-20s %-20s %-20s %-10s%n", "Código", "Nome", "Preço de compra", "Preço de venda", "Quantidade disponível");
-        produtos.forEach(p -> System.out.printf("%-10d %-20s %-20s %-10s%n", p.codigo(), p.nome(), NumberFormat.getCurrencyInstance(brasil).format(p.precoCompra()), NumberFormat.getCurrencyInstance(brasil).format(p.precoVenda()), p.qtdComprada()));
+        produtos.forEach(p -> System.out.printf("%-10d %-20s %-20s %-20s %-10.2f%n", p.codigo(), p.nome(), NumberFormat.getCurrencyInstance(brasil).format(p.precoCompra()), NumberFormat.getCurrencyInstance(brasil).format(p.precoVenda()), p.qtdComprada()));
 
         var produto = selecionarProdutoPorCodigo(scan, produtos);
         var optPreco = scan.lerOption("Você quer alterar o [ 1 ] preço de compra ou [ 2 ] preço de venda? ", 1, 2, "Tipo de preço inválido");
